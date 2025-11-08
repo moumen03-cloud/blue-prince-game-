@@ -10,4 +10,11 @@ class Room:
         self.visited = False
         self.name = name
        
+class Player:
+    def __init__(self, start_steps: int):
+        self.steps_left = start_steps
+        self.inventory = {"bread": 0, "coins": 5, "gems": 1, "keys": 2, "dice": 3}
+        self.toolbelt = ["Shovel", "Metal Detector"]
+        self.pos_y = 8
+        self.pos_x = 1
         
