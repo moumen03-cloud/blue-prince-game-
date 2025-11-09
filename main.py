@@ -17,7 +17,7 @@ class Room:
 class Player:
     def __init__(self, start_steps: int):
         self.steps_left = start_steps
-        self.inventory = {"bread": 0, "coins": 5, "gems": 1, "keys": 2, "dice": 3}
+        self.inventory = {"bread": 0, "coins": 5, "gems": 1, "keys": 2, "dice": 2}
         self.toolbelt = ["Shovel", "Metal Detector"]
         self.pos_y = 8
         self.pos_x = 1
@@ -33,4 +33,25 @@ class Player:
             self.inventory[item] -= amount
             return True
         return False    
+    
+    def collect(self, room):
+        if room.visited:
+            return {}
+        gained = {}
+        for k in ("bread", "coins", "gems", "keys", "dice"):
+            v = room.resources.get(k, 0)
+            if v > 0:
+                self.inventory[k] = self.inventory.get(k, 0) + v
+                gained[k] = v
+                room.resources[k] = 0
+        tools = room.resources.get("tools", [])
+        if tools:
+            gained["tools"] = []
+            for t in tools:
+                if t not in self.toolbelt:
+                    self.toolbelt.append(t)
+                gained["tools"].append(t)
+            room.resources["tools"] = []
+        room.visited = True
+        return gained
         
