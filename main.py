@@ -55,3 +55,28 @@ class Player:
         room.visited = True
         return gained
         
+ALL_ROOM_NAMES = [name for name in DEFAULT_EXITS.keys() if name not in {"ENTRANCE HALL", "ANTECHAMBER"}]
+TOOL_POOL = ["Crowbar", "Lockpick", "Torch", "Rope", "Goggles"]
+
+def _get_opposite_direction(direction):
+    opposites = {"haut": "bas", "bas": "haut", "gauche": "droite", "droite": "gauche"}
+    return opposites.get(direction)
+
+def get_exits_from_template(room_name: str) -> dict:
+    template = DEFAULT_EXITS.get(room_name.upper(), {"haut": 1, "bas": 1, "gauche": 1, "droite": 1})
+    return {d: bool(v) for d, v in template.items()}
+
+def generate_random_room(y, x):
+    is_special = random.random() < 0.3
+    room_type = "special" if is_special else "standard"
+    name = random.choice(ALL_ROOM_NAMES)
+    exits = get_exits_from_template(name)
+
+    base = {"bread": random.randint(0, 1),
+            "dice": random.randint(0, 1),
+            "coins": random.randint(0, 2),
+            "gems": 0,
+            "keys": 0,
+            "tools": []}
+
+    
