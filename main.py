@@ -21,4 +21,16 @@ class Player:
         self.toolbelt = ["Shovel", "Metal Detector"]
         self.pos_y = 8
         self.pos_x = 1
+
+    def move(self):
+        if self.steps_left > 0:
+            self.steps_left -= 1
+            return True
+        return False
+
+    def pay(self, item, amount):
+        if self.inventory.get(item, 0) >= amount:
+            self.inventory[item] -= amount
+            return True
+        return False    
         
