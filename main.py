@@ -78,5 +78,49 @@ def generate_random_room(y, x):
             "gems": 0,
             "keys": 0,
             "tools": []}
+    if is_special:
+        base["gems"] = random.randint(1, 2)
+        base["keys"] = random.randint(0, 1)
+
+    if name == "BEDROOM":
+        base["dice"] += 2
+    elif name == "DEN":
+        base["gems"] += 1
+    elif name == "GUEST BEDROOM":
+        base["bread"] += 10
+    elif name == "NOOK":
+        base["keys"] += 1
+    elif name == "STOREROOM":
+        base["keys"] += 1; base["gems"] += 1; base["coins"] += 1
+
+    tool_chance = 0.15 if is_special else 0.10
+    if random.random() < tool_chance:
+        n_tools = 2 if (is_special and random.random() < 0.25) else 1
+        base["tools"] = random.sample(TOOL_POOL, k=min(n_tools, len(TOOL_POOL)))
+
+    entrance_fee = 0
+    if random.random() < (0.22 if is_special else 0.15):
+        entrance_fee = 1 if not is_special else random.choice([1, 2, 3])
+
+    return Room(x, y, room_type=room_type, resources=base, exits=exits, name=name, entrance_fee=entrance_fee)
+
+def generate_compatible_room(y, x, direction_from_player: str):
+    required_exit = _get_opposite_direction(direction_from_player)
+    compatible_room = None
+    while compatible_room is None:
+        temp_room = generate_random_room(y, x)
+        if temp_room.exits.get(required_exit, False):
+            compatible_room = temp_room
+    return compatible_room
+
+def generate_unique_proposals(y, x, direction_from_player: str, count=3):
+    seen = set(); props = []; tries = 0; max_tries = 80
+    while len(props) < count and tries < max_tries:
+        r = generate_compatible_room(y, x, direction_from_player)
+        if r.name.upper() not in seen:
+            seen.add(r.name.upper()); props.append(r)
+        tries += 1
+    return props
+
 
     
