@@ -122,5 +122,60 @@ def generate_unique_proposals(y, x, direction_from_player: str, count=3):
         tries += 1
     return props
 
+def setup_dungeon(rows=9, cols=6):
+    grid = [[None for _ in range(cols)] for _ in range(rows)]
+    start_exits = get_exits_from_template("ENTRANCE HALL")
+    start = Room(1, 8, "standard",
+                 resources={"bread": 1, "coins": 1, "gems": 0, "keys": 0, "dice": 1, "tools": []},
+                 exits=start_exits, name="ENTRANCE HALL", entrance_fee=0)
+    start.visited = True
+    grid[8][1] = start
+    end_exits = get_exits_from_template("ANTECHAMBER")
+    end = Room(2, 0, "special",
+               resources={"bread": 3, "coins": 5, "gems": 5, "keys": 2, "dice": 3, "tools": []},
+               exits=end_exits, name="ANTECHAMBER", entrance_fee=0)
+    grid[0][2] = end
+    return grid
+
+
+IMAGE_FOLDER = "images projet"
+BACKGROUND_IMAGE_PATH = os.path.join(IMAGE_FOLDER, "image arriere plan.png")
+
+ROOM_IMAGES = {
+    "ANTECHAMBER": os.path.join(IMAGE_FOLDER, "antechamber.png.png"),
+    "AQUARIUM": os.path.join(IMAGE_FOLDER, "aquarium.png.png"),
+    "BEDROOM": os.path.join(IMAGE_FOLDER, "bedroom.png.png"),
+    "BOUDOIR": os.path.join(IMAGE_FOLDER, "boudoir.png"),
+    "CLOISTER": os.path.join(IMAGE_FOLDER, "cloister.png.png"),
+    "CLOSET": os.path.join(IMAGE_FOLDER, "closet.ong.png"),
+    "COMMISSARY": os.path.join(IMAGE_FOLDER, "commissary.png.png"),
+    "CONFERENCE ROOM": os.path.join(IMAGE_FOLDER, "conference room.png.png"),
+    "CORRIDOR": os.path.join(IMAGE_FOLDER, "corridor.png.png"),
+    "DEN": os.path.join(IMAGE_FOLDER, "den.png.png"),
+    "DINING ROOM": os.path.join(IMAGE_FOLDER, "dining room.png.png"),
+    "DRAWING ROOM": os.path.join(IMAGE_FOLDER, "drawing room.png.png"),
+    "ENTRANCE HALL": os.path.join(IMAGE_FOLDER, "entrance hall.png.png"),
+    "FURNACE": os.path.join(IMAGE_FOLDER, "furnace.png.png"),
+    "GUEST BEDROOM": os.path.join(IMAGE_FOLDER, "guest room.png.png"),
+    "GYMNASIUM": os.path.join(IMAGE_FOLDER, "gymnasium.png.png"),
+    "HALLWAY": os.path.join(IMAGE_FOLDER, "hallway.png.png"),
+    "KITCHEN": os.path.join(IMAGE_FOLDER, "kitchen.png.png"),
+    "LAVATORY": os.path.join(IMAGE_FOLDER, "lvatory.png.png"),
+    "NOOK": os.path.join(IMAGE_FOLDER, "nook.png.png"),
+    "PANTRY": os.path.join(IMAGE_FOLDER, "pantry.png.png"),
+    "PARLOR": os.path.join(IMAGE_FOLDER, "parlor.png.png"),
+    "PATIO": os.path.join(IMAGE_FOLDER, "patio.png.png"),
+    "THE POOL": os.path.join(IMAGE_FOLDER, "pool.png.png"),
+    "RUMPUS ROOM": os.path.join(IMAGE_FOLDER, "rumpus room.png"),
+    "SERVANT'S QUARTERS": os.path.join(IMAGE_FOLDER, "sevant's quarters.png.png"),
+    "SOLARIUM": os.path.join(IMAGE_FOLDER, "solarium.png.png"),
+    "SPARE ROOM": os.path.join(IMAGE_FOLDER, "spare room.png.png"),
+    "STOREROOM": os.path.join(IMAGE_FOLDER, "storeroom.png.png"),
+    "STUDY": os.path.join(IMAGE_FOLDER, "study.png.png"),
+    "WALK-IN CLOSET": os.path.join(IMAGE_FOLDER, "walk in closet.png.png"),
+    "WEST WING HALL": os.path.join(IMAGE_FOLDER, "west wing hall.png.png"),
+    "WORKSHOP": os.path.join(IMAGE_FOLDER, "worksop.png.png"),
+}
+
 
     
