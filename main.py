@@ -266,7 +266,7 @@ class ApplicationPygame:
             
             pygame.display.flip()
             HORLOGE.tick(IPS)
-     def __init__(self, ecran):
+    def __init__(self, ecran):
         self.ecran = ecran
         self.LIGNES, self.COLONNES = 9, 5
         self.joueur = Joueur(pas_départ=70)
@@ -360,3 +360,23 @@ class ApplicationPygame:
                 cache_images[f"{nom}_proposition"] = self._créer_surface_substitut(nom, self.TAILLE_IMAGE_PROPOSITION_CARTE)
 
         return cache_images
+    def _créer_surface_substitut(self, nom, taille, est_spéciale=False):
+        surface = pygame.Surface((taille, taille))
+        surface.fill(BLEU)
+        couleur = BLEU_FONCE if est_spéciale else MARRON_FONCE
+        pygame.draw.rect(surface, couleur, (5, 5, taille - 10, taille - 10), 0)
+        pygame.draw.rect(surface, COULEUR_ACCENT, (5, 5, taille - 10, taille - 10), 3)
+
+        texte = [nom, "(PAS IMAGE)"]
+        police_à_utiliser = self.police_p if taille < 100 else self.police_m
+        for i, ligne in enumerate(texte):
+            surface_texte = police_à_utiliser.render(ligne, True, COULEUR_TEXTE)
+            rect_texte = surface_texte.get_rect(center=(taille // 2, taille // 2 + i * (police_à_utiliser.get_height() + 2) - (police_à_utiliser.get_height())))
+            surface.blit(surface_texte, rect_texte)
+        return surface
+
+    def _dessiner_texte(self, surface, texte, pos, police, couleur=COULEUR_TEXTE, ancre="topleft"):
+        surface_texte = police.render(texte, True, couleur)
+        rect_texte = surface_texte.get_rect(**{ancre: pos})
+        surface.blit(surface_texte, rect_texte)
+        return rect_texte
