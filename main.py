@@ -266,3 +266,97 @@ class ApplicationPygame:
             
             pygame.display.flip()
             HORLOGE.tick(IPS)
+     def __init__(self, ecran):
+        self.ecran = ecran
+        self.LIGNES, self.COLONNES = 9, 5
+        self.joueur = Joueur(pas_départ=70)
+        self.donjon = configurer_donjon(self.LIGNES, self.COLONNES)
+        self.police_p = pygame.font.Font(None, 18)
+        self.police_m = pygame.font.Font(None, 24)
+        self.police_g = pygame.font.Font(None, 36)
+        self.police_tg = pygame.font.Font(None, 48)
+        self.police_symbole = pygame.font.SysFont('Segoe UI Emoji', 24)
+
+        # --- Définitions des dimensions ---
+        
+        # 1. TAILLES FIXES ET AGRANDIES
+        self.TAILLE_IMAGE_SALLE_CARTE = 64
+
+        self.TAILLE_IMAGE_PROPOSITION_CARTE = 180 
+
+        # 2. DIMENSIONS DE LA CARTE (MAP_RECT -> RECT_CARTE)
+        self.MARGE = 20
+        self.CELLULE_L = self.TAILLE_IMAGE_SALLE_CARTE + 8
+        self.CELLULE_H = self.TAILLE_IMAGE_SALLE_CARTE + 8
+        
+        carte_l = self.COLONNES * self.CELLULE_L + 2 * self.MARGE
+        carte_h = self.LIGNES * self.CELLULE_H + 2 * self.MARGE
+        self.RECT_CARTE = pygame.Rect(12, 12, carte_l, carte_h)
+
+        # 3. DIMENSIONS DU PANNEAU (PANEL_RECT -> RECT_PANNEAU)
+        self.RECT_PANNEAU = pygame.Rect(self.RECT_CARTE.right + 12, 12, FENETRE_L - self.RECT_CARTE.right - 24, 680)
+
+        # Bouton Redraw (RECT_REDESSINER)
+        self.RECT_REDESSINER_BOUTON = pygame.Rect(
+            self.RECT_PANNEAU.x + self.RECT_PANNEAU.width - 160 - 24,
+            self.RECT_PANNEAU.y + 180 + 6 + 48,
+            150, 40)
+
+        # 4. RECTANGLES DE CARTES (RECTS_CARTES)
+        self.RECTS_CARTES = []
+        ESPACE_CARTES_L = self.RECT_PANNEAU.width - 50
+        ECART_CARTES = 5
+        self.CADRE_CARTE_L = (ESPACE_CARTES_L - 5 * ECART_CARTES) // 3
+        
+        HAUTEUR_EXTRA_CADRE = 20
+        hauteur_totale_carte = self.TAILLE_IMAGE_PROPOSITION_CARTE + 3 * HAUTEUR_EXTRA_CADRE + 2 * 60
+        
+        base_x = self.RECT_PANNEAU.x + 24
+        for i in range(3):
+            x = base_x + i * (self.CADRE_CARTE_L + ECART_CARTES)
+            y = self.RECT_PANNEAU.y + 200 + 80
+            self.RECTS_CARTES.append(pygame.Rect(x, y, self.CADRE_CARTE_L, hauteur_totale_carte))
+
+        self.images = self._charger_images() 
+        
+        self.action = None
+        self.cible = None
+        self.propositions = []
+        self.direction_selectionnee = None
+        self.dernier_butin_texte = "—"
+        self.boite_message = None
+
+    def _charger_images(self):
+        cache_images = {}
+        
+        # 1. Fond
+        try:
+            chemin_fond = CHEMIN_IMAGE_FOND
+            if os.path.exists(chemin_fond):
+                img = pygame.image.load(chemin_fond).convert_alpha()
+                cache_images['FOND'] = pygame.transform.scale(img, (self.RECT_CARTE.width, self.RECT_CARTE.height))
+            else:
+                print(f"ATTENTION: Image de fond non trouvée: {chemin_fond}")
+        except pygame.error as e:
+            print(f"Erreur de chargement de l'image de fond: {e}")
+
+        # 2. Images de Salle
+        for nom, chemin in CARTOGRAPHIE_IMAGES_SALLES.items():
+            try:
+                if os.path.exists(chemin):
+                    img = pygame.image.load(chemin).convert_alpha()
+                    w, h = img.get_size()
+                    m = min(w, h)
+                    img_rognee = img.subsurface(pygame.Rect((w - m) // 2, (h - m) // 2, m, m))
+                    
+                    # Deux versions de l'image
+                    cache_images[f"{nom}_carte"] = pygame.transform.scale(img_rognee, (self.TAILLE_IMAGE_SALLE_CARTE, self.TAILLE_IMAGE_SALLE_CARTE))
+                    cache_images[f"{nom}_proposition"] = pygame.transform.scale(img_rognee, (self.TAILLE_IMAGE_PROPOSITION_CARTE, self.TAILLE_IMAGE_PROPOSITION_CARTE))
+                else:
+                    cache_images[f"{nom}_carte"] = self._créer_surface_substitut(nom, self.TAILLE_IMAGE_SALLE_CARTE)
+                    cache_images[f"{nom}_proposition"] = self._créer_surface_substitut(nom, self.TAILLE_IMAGE_PROPOSITION_CARTE)
+            except pygame.error:
+                cache_images[f"{nom}_carte"] = self._créer_surface_substitut(nom, self.TAILLE_IMAGE_SALLE_CARTE)
+                cache_images[f"{nom}_proposition"] = self._créer_surface_substitut(nom, self.TAILLE_IMAGE_PROPOSITION_CARTE)
+
+        return cache_images
