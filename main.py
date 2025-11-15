@@ -503,4 +503,4 @@ class ApplicationPygame:
 
         if self.boite_message:
             self._dessiner_boîte_message()  
-    
+###########""""""""""""""""""""    
