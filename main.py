@@ -380,3 +380,127 @@ class ApplicationPygame:
         rect_texte = surface_texte.get_rect(**{ancre: pos})
         surface.blit(surface_texte, rect_texte)
         return rect_texte
+
+
+    def _dessiner_carte(self):
+        pygame.draw.rect(self.ecran, COULEUR_FOND_CARTE_PRINCIPALE, self.RECT_CARTE)
+        if 'FOND' in self.images:
+            self.ecran.blit(self.images['FOND'], self.RECT_CARTE.topleft)
+        
+        for y in range(self.LIGNES):
+            for x in range(self.COLONNES):
+                x1 = self.RECT_CARTE.x + self.MARGE + x * self.CELLULE_L
+                y1 = self.RECT_CARTE.y + self.MARGE + y * self.CELLULE_H
+                x2 = x1 + self.CELLULE_L
+                y2 = y1 + self.CELLULE_H
+                
+                rect_cellule = pygame.Rect(x1, y1, self.CELLULE_L, self.CELLULE_H)
+                salle = self.donjon[y][x]
+
+                couleur_contour = (51, 51, 51); épaisseur_contour = 1
+                if y == self.joueur.pos_y and x == self.joueur.pos_x:
+                    couleur_contour = COULEUR_ACCENT; épaisseur_contour = 3
+                pygame.draw.rect(self.ecran, couleur_contour, rect_cellule, épaisseur_contour)
+
+                if salle is not None:
+                    nom_salle = salle.nom.upper()
+                    img_salle = self.images.get(f"{nom_salle}_carte")
+                    if img_salle is None:
+                        img_salle = self._créer_surface_substitut(nom_salle, self.TAILLE_IMAGE_SALLE_CARTE, salle.type_salle == "special")
+                        self.images[f"{nom_salle}_carte"] = img_salle
+                        
+                    rect_image = img_salle.get_rect(center=rect_cellule.center)
+                    self.ecran.blit(img_salle, rect_image.topleft)
+
+                    épaisseur_porte = 4
+                    couleur_porte = JAUNE if salle.type_salle == "special" else COULEUR_TEXTE
+                    if salle.sorties.get("haut"): pygame.draw.line(self.ecran, couleur_porte, (x1 + self.CELLULE_L / 3, y1), (x2 - self.CELLULE_L / 3, y1), épaisseur_porte)
+                    if salle.sorties.get("bas"): pygame.draw.line(self.ecran, couleur_porte, (x1 + self.CELLULE_L / 3, y2), (x2 - self.CELLULE_L / 3, y2), épaisseur_porte)
+                    if salle.sorties.get("gauche"): pygame.draw.line(self.ecran, couleur_porte, (x1, y1 + self.CELLULE_H / 3), (x1, y2 - self.CELLULE_H / 3), épaisseur_porte)
+                    if salle.sorties.get("droite"): pygame.draw.line(self.ecran, couleur_porte, (x2, y1 + self.CELLULE_H / 3), (x2, y2 - self.CELLULE_H / 3), épaisseur_porte)
+                
+                if y == self.joueur.pos_y and x == self.joueur.pos_x:
+                    self._dessiner_texte(self.ecran, "👤", rect_cellule.center, self.police_tg, JAUNE, ancre="center")
+
+                if self.action == "draft" and self.cible == (y, x):
+                    pygame.draw.rect(self.ecran, ROUGE, rect_cellule, 4)
+                    self._dessiner_texte(self.ecran, "?", rect_cellule.center, self.police_g, ROUGE, ancre="center")
+    
+    def _dessiner_panneau(self):
+        pygame.draw.rect(self.ecran, COULEUR_FOND_PANNEAU, self.RECT_PANNEAU)
+        
+        # --- Inventaire et Ressources ---
+        inv_rect = pygame.Rect(self.RECT_PANNEAU.x + 24, self.RECT_PANNEAU.y + 16, (self.RECT_PANNEAU.width - 48) // 2, 180)
+        self._dessiner_texte(self.ecran, "INVENTAIRE", inv_rect.topleft, self.police_g, COULEUR_TEXTE)
+        
+        tool_y = inv_rect.top + 40
+        for outil in self.joueur.ceinture_outils:
+            self._dessiner_texte(self.ecran, f" > {outil}", (inv_rect.left, tool_y), self.police_m, (160, 160, 160))
+            tool_y += 20
+        
+        res_rect = pygame.Rect(self.RECT_PANNEAU.x + self.RECT_PANNEAU.width // 2 + 10, self.RECT_PANNEAU.y + 16, self.RECT_PANNEAU.width // 2 - 34, 180)
+        self._dessiner_texte(self.ecran, "RESSOURCES", res_rect.topright, self.police_m, (160, 160, 160), ancre="topright")
+        
+        données_ressources = [
+            ("PAS RESTANTS", self.joueur.pas_restants , "🦶", COULEUR_ACCENT),
+            ("PIÈCES", self.joueur.inventaire["coins"], "💰", COULEUR_ACCENT ),
+            ("GEMMES", self.joueur.inventaire["gems"], "💎", COULEUR_ACCENT),
+            ("CLÉS", self.joueur.inventaire["keys"], "🔑", COULEUR_ACCENT),
+            ("DÉS", self.joueur.inventaire["dice"], "🎲", COULEUR_ACCENT),
+        ]
+        
+        res_y = res_rect.top + 40
+        for texte, valeur, icône, couleur_icône in données_ressources:
+            val_surf = self.police_g.render(str(valeur), True, JAUNE)
+            val_rect = val_surf.get_rect(right=res_rect.right - 40, top=res_y)
+            self.ecran.blit(val_surf, val_rect)
+            self._dessiner_texte(self.ecran, texte, (val_rect.left - 4, res_y + 4), self.police_m, COULEUR_TEXTE, ancre="topright")
+            self._dessiner_texte(self.ecran, icône, (res_rect.right, res_y + 4), self.police_g, couleur_icône, ancre="topright")
+            res_y += 30
+
+        loot_rect = pygame.Rect(self.RECT_PANNEAU.x + 24, self.RECT_PANNEAU.y + 16 + 182, self.RECT_PANNEAU.width - 48, 24)
+        self._dessiner_texte(self.ecran, f"Dernier butin : {self.dernier_butin_texte}", loot_rect.topleft, self.police_m, (255, 211, 105))
+        # --- Zone de Draft ---
+        draft_y = self.RECT_PANNEAU.y + 240
+        
+        titre_texte = "Explorer ou attendre"
+        titre_couleur = COULEUR_TEXTE
+        if self.action == "draft":
+            titre_texte = "CHOISISSEZ UNE SALLE "
+            titre_couleur = JAUNE
+        
+        self._dessiner_texte(self.ecran, titre_texte, (self.RECT_PANNEAU.x + 24, draft_y + 10), self.police_g, titre_couleur)
+
+        if self.action == "draft":
+            pygame.draw.rect(self.ecran, COULEUR_ACCENT if self.joueur.inventaire["dice"] > 0 else (60, 60, 60), self.RECT_REDESSINER_BOUTON, 0, 5)
+            self._dessiner_texte(self.ecran, "🎲 Redraw (D)", self.RECT_REDESSINER_BOUTON.center, self.police_m, COULEUR_FOND_CARTE_PRINCIPALE, ancre="center")
+        
+            for i, r in enumerate(self.propositions):
+                rect_carte = self.RECTS_CARTES[i]
+                
+                pygame.draw.rect(self.ecran, COULEUR_FOND_CARTE, rect_carte, 0, 5)
+                
+                nom_salle = r.nom.upper()
+                img_salle = self.images.get(f"{nom_salle}_proposition")
+                if img_salle is None:
+                    img_salle = self._créer_surface_substitut(nom_salle, self.TAILLE_IMAGE_PROPOSITION_CARTE, r.type_salle == "special")
+                    self.images[f"{nom_salle}_proposition"] = img_salle
+                
+                rect_image = img_salle.get_rect(centerx=rect_carte.centerx, top=rect_carte.top + 8 + self.TAILLE_IMAGE_PROPOSITION_CARTE // 2)
+                self.ecran.blit(img_salle, rect_image.topleft)
+
+                lines = [r.nom, f"TYPE: {r.type_salle.upper()}"]
+                if r.type_salle == "special": lines.append(f"COÛT: {r.cout}C")
+                if r.frais_entrée > 0: lines.append(f"FRAIS: {r.frais_entrée}C POUR ENTRER")
+                
+                desc_y = rect_image.bottom + 10
+                for ligne in lines:
+                    self._dessiner_texte(self.ecran, ligne, (rect_carte.left + 8, desc_y), self.police_m, COULEUR_TEXTE)
+                    desc_y += 20
+                
+                hint_rect = pygame.Rect(rect_carte.left, rect_carte.bottom - 25, rect_carte.width, 20)
+                self._dessiner_texte(self.ecran, f"PRESSEZ [{i+1}]", hint_rect.center, self.police_p, COULEUR_ACCENT, ancre="center")
+
+        if self.boite_message:
+            self._dessiner_boîte_message()  
+    
