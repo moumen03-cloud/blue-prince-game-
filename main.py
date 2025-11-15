@@ -1,3 +1,31 @@
+import os
+import pygame
+import random
+from chambres_portes import DEFAULT_EXITS
+
+# Configuration de Pygame
+pygame.init()
+
+#  Constantes Pygame 
+FENETRE_L, FENETRE_H = 1200, 720
+ECRAN = pygame.display.set_mode((FENETRE_L, FENETRE_H))
+pygame.display.set_caption(" Draft des Salles (Pygame)")
+HORLOGE = pygame.time.Clock()
+IPS = 60
+
+#  Couleurs 
+COULEUR_TEXTE = (224, 224, 224)
+COULEUR_ACCENT = (0, 255, 0)
+COULEUR_FOND_PANNEAU = (30, 30, 30)
+COULEUR_FOND_CARTE = (42, 42, 42)
+COULEUR_FOND_CARTE_PRINCIPALE = (0, 0, 0)
+JAUNE = (255, 255, 0)
+ROUGE = (255, 0, 0)
+BLEU = (30, 30, 40)
+BLEU_FONCE = (40, 60, 100)
+MARRON_FONCE = (70, 45, 30)
+
+
 class Room:
     def __init__(self, x, y, room_type="standard", resources=None, exits=None, name="ROOM", entrance_fee=0):
         self.pos_x = x
@@ -136,6 +164,50 @@ def setup_dungeon(rows=9, cols=6):
                exits=end_exits, name="ANTECHAMBER", entrance_fee=0)
     grid[0][2] = end
     return grid
+
+#  Dossiers/Images 
+
+DOSSIER_IMAGE = "images projet"
+CHEMIN_IMAGE_FOND = os.path.join(DOSSIER_IMAGE, "image arriere .plan.png")
+
+# Les images de salle
+CHEMIN_IMAGE_INTRO = os.path.join(DOSSIER_IMAGE, "image introduction du jeu.png")
+CARTOGRAPHIE_IMAGES_SALLES = {
+    "ANTECHAMBER": os.path.join(DOSSIER_IMAGE, "antechamber.png.png"),
+    "AQUARIUM": os.path.join(DOSSIER_IMAGE, "aquarium.png.png"),
+    "BEDROOM": os.path.join(DOSSIER_IMAGE, "bedroom.png.png"),
+    "BOUDOIR": os.path.join(DOSSIER_IMAGE, "boudoir.png"),
+    "CLOISTER": os.path.join(DOSSIER_IMAGE, "cloister.png.png"),
+    "CLOSET": os.path.join(DOSSIER_IMAGE, "closet.ong.png"),
+    "COMMISSARY": os.path.join(DOSSIER_IMAGE, "commissary.png.png"),
+    "CONFERENCE ROOM": os.path.join(DOSSIER_IMAGE, "conference room.png.png"),
+    "CORRIDOR": os.path.join(DOSSIER_IMAGE, "corridor.png.png"),
+    "DEN": os.path.join(DOSSIER_IMAGE, "den.png.png"),
+    "DINING ROOM": os.path.join(DOSSIER_IMAGE, "dining room.png.png"),
+    "DRAWING ROOM": os.path.join(DOSSIER_IMAGE, "drawing room.png.png"),
+    "ENTRANCE HALL": os.path.join(DOSSIER_IMAGE, "entrance hall.png.png"),
+    "FURNACE": os.path.join(DOSSIER_IMAGE, "furnace.png.png"),
+    "GUEST BEDROOM": os.path.join(DOSSIER_IMAGE, "guest room.png.png"),
+    "GYMNASIUM": os.path.join(DOSSIER_IMAGE, "gymnasium.png.png"),
+    "HALLWAY": os.path.join(DOSSIER_IMAGE, "hallway.png.png"),
+    "KITCHEN": os.path.join(DOSSIER_IMAGE, "kitchen.png.png"),
+    "LAVATORY": os.path.join(DOSSIER_IMAGE, "lvatory.png.png"),
+    "NOOK": os.path.join(DOSSIER_IMAGE, "nook.png.png"),
+    "PANTRY": os.path.join(DOSSIER_IMAGE, "pantry.png.png"),
+    "PARLOR": os.path.join(DOSSIER_IMAGE, "parlor.png.png"),
+    "PATIO": os.path.join(DOSSIER_IMAGE, "patio.png.png"),
+    "THE POOL": os.path.join(DOSSIER_IMAGE, "pool.png.png"),
+    "RUMPUS ROOM": os.path.join(DOSSIER_IMAGE, "rumpus room.png"),
+    "SERVANT'S QUARTERS": os.path.join(DOSSIER_IMAGE, "sevant's quarters.png.png"),
+    "SOLARIUM": os.path.join(DOSSIER_IMAGE, "solarium.png.png"),
+    "SPARE ROOM": os.path.join(DOSSIER_IMAGE, "spare room.png.png"),
+    "STOREROOM": os.path.join(DOSSIER_IMAGE, "storeroom.png.png"),
+    "STUDY": os.path.join(DOSSIER_IMAGE, "study.png.png"),
+    "WALK-IN CLOSET": os.path.join(DOSSIER_IMAGE, "walk in closet.png.png"),
+    "WEST WING HALL": os.path.join(DOSSIER_IMAGE, "west wing hall.png.png"),
+    "WORKSHOP": os.path.join(DOSSIER_IMAGE, "worksop.png.png"),
+}
+
 
 
 
