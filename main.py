@@ -1,6 +1,7 @@
 import os
 import random
 import pygame
+import sys
 from chambres_portes import DEFAULT_EXITS
 
 # Configuration de Pygame
@@ -215,3 +216,53 @@ def configurer_donjon(lignes=9, colonnes=6):
     grille[0][2] = fin
     return grille
 
+# 3) Interface Utilisateur Pygame
+
+
+class ApplicationPygame:
+
+    def afficher_introduction(self):
+        """Affiche l'écran d'introduction et attend que l'utilisateur appuie sur ENTRÉE."""
+        # Tenter de charger l'image d'introduction
+        image_intro = None
+        try:
+            if os.path.exists(CHEMIN_IMAGE_INTRO):
+                # Charger et redimensionner l'image pour qu'elle remplisse la fenêtre
+                img_pil = pygame.image.load(CHEMIN_IMAGE_INTRO).convert()
+                image_intro = pygame.transform.scale(img_pil, (FENETRE_L, FENETRE_H))
+            else:
+                print(f"ATTENTION: Image d'introduction non trouvée: {CHEMIN_IMAGE_INTRO}. Utilisation d'un fond noir.")
+        except pygame.error as e:
+            print(f"Erreur de chargement de l'image d'introduction: {e}. Utilisation d'un fond noir.")
+
+        intro = True
+        while intro:
+            for événement in pygame.event.get():
+                if événement.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                
+                if événement.type == pygame.KEYDOWN:
+                    if événement.key == pygame.K_RETURN:
+                        intro = False # Quitter la boucle d'intro si ENTRÉE est pressée
+
+            #  Dessin de l'écran d'introduction 
+            if image_intro:
+                self.ecran.blit(image_intro, (0, 0))
+            else:
+                self.ecran.fill(COULEUR_FOND_CARTE_PRINCIPALE) # Fond noir si l'image manque
+
+            # Texte "Appuyez sur Entrée"
+            texte_prompt = "PRESSEZ [ENTRÉE] POUR COMMENCER"
+            surface_prompt = self.police_g.render(texte_prompt, True, JAUNE)
+            rect_prompt = surface_prompt.get_rect(center=(FENETRE_L // 2, FENETRE_H - 50))
+            
+            # Dessiner un fond semi-transparent pour le texte (facultatif mais recommandé pour la lisibilité)
+            fond_prompt = pygame.Surface((rect_prompt.width + 20, rect_prompt.height + 10), pygame.SRCALPHA)
+            fond_prompt.fill((0, 0, 0, 180)) # Noir semi-transparent
+            self.ecran.blit(fond_prompt, (rect_prompt.left - 10, rect_prompt.top - 5))
+
+            self.ecran.blit(surface_prompt, rect_prompt)
+            
+            pygame.display.flip()
+            HORLOGE.tick(IPS)
