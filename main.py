@@ -1,6 +1,6 @@
 import os
-import pygame
 import random
+import pygame
 from chambres_portes import DEFAULT_EXITS
 
 # Configuration de Pygame
@@ -24,146 +24,6 @@ ROUGE = (255, 0, 0)
 BLEU = (30, 30, 40)
 BLEU_FONCE = (40, 60, 100)
 MARRON_FONCE = (70, 45, 30)
-
-
-class Room:
-    def __init__(self, x, y, room_type="standard", resources=None, exits=None, name="ROOM", entrance_fee=0):
-        self.pos_x = x
-        self.pos_y = y
-        self.room_type = room_type
-        self.cost = 1 if room_type == "special" else 0  # coût de pose (hérité)
-        # [TOOLS] on ajoute "tools" (liste) dans les ressources
-        self.resources = resources if resources is not None else {
-            "bread": 0, "coins": 0, "gems": 0, "keys": 0, "dice": 0, "tools": []
-        }
-        self.exits = exits if exits is not None else {}
-        self.visited = False
-        self.name = name
-        # [PAID] frais d’entrée (coins) à payer pour accéder/collecter
-        self.entrance_fee = max(0, int(entrance_fee))
-       
-class Player:
-    def __init__(self, start_steps: int):
-        self.steps_left = start_steps
-        self.inventory = {"bread": 0, "coins": 5, "gems": 1, "keys": 2, "dice": 2}
-        self.toolbelt = ["Shovel", "Metal Detector"]
-        self.pos_y = 8
-        self.pos_x = 1
-
-    def move(self):
-        if self.steps_left > 0:
-            self.steps_left -= 1
-            return True
-        return False
-
-    def pay(self, item, amount):
-        if self.inventory.get(item, 0) >= amount:
-            self.inventory[item] -= amount
-            return True
-        return False    
-    
-    def collect(self, room):
-        if room.visited:
-            return {}
-        gained = {}
-        for k in ("bread", "coins", "gems", "keys", "dice"):
-            v = room.resources.get(k, 0)
-            if v > 0:
-                self.inventory[k] = self.inventory.get(k, 0) + v
-                gained[k] = v
-                room.resources[k] = 0
-        tools = room.resources.get("tools", [])
-        if tools:
-            gained["tools"] = []
-            for t in tools:
-                if t not in self.toolbelt:
-                    self.toolbelt.append(t)
-                gained["tools"].append(t)
-            room.resources["tools"] = []
-        room.visited = True
-        return gained
-        
-ALL_ROOM_NAMES = [name for name in DEFAULT_EXITS.keys() if name not in {"ENTRANCE HALL", "ANTECHAMBER"}]
-TOOL_POOL = ["Crowbar", "Lockpick", "Torch", "Rope", "Goggles"]
-
-def _get_opposite_direction(direction):
-    opposites = {"haut": "bas", "bas": "haut", "gauche": "droite", "droite": "gauche"}
-    return opposites.get(direction)
-
-def get_exits_from_template(room_name: str) -> dict:
-    template = DEFAULT_EXITS.get(room_name.upper(), {"haut": 1, "bas": 1, "gauche": 1, "droite": 1})
-    return {d: bool(v) for d, v in template.items()}
-
-def generate_random_room(y, x):
-    is_special = random.random() < 0.3
-    room_type = "special" if is_special else "standard"
-    name = random.choice(ALL_ROOM_NAMES)
-    exits = get_exits_from_template(name)
-
-    base = {"bread": random.randint(0, 1),
-            "dice": random.randint(0, 1),
-            "coins": random.randint(0, 2),
-            "gems": 0,
-            "keys": 0,
-            "tools": []}
-    if is_special:
-        base["gems"] = random.randint(1, 2)
-        base["keys"] = random.randint(0, 1)
-
-    if name == "BEDROOM":
-        base["dice"] += 2
-    elif name == "DEN":
-        base["gems"] += 1
-    elif name == "GUEST BEDROOM":
-        base["bread"] += 10
-    elif name == "NOOK":
-        base["keys"] += 1
-    elif name == "STOREROOM":
-        base["keys"] += 1; base["gems"] += 1; base["coins"] += 1
-
-    tool_chance = 0.15 if is_special else 0.10
-    if random.random() < tool_chance:
-        n_tools = 2 if (is_special and random.random() < 0.25) else 1
-        base["tools"] = random.sample(TOOL_POOL, k=min(n_tools, len(TOOL_POOL)))
-
-    entrance_fee = 0
-    if random.random() < (0.22 if is_special else 0.15):
-        entrance_fee = 1 if not is_special else random.choice([1, 2, 3])
-
-    return Room(x, y, room_type=room_type, resources=base, exits=exits, name=name, entrance_fee=entrance_fee)
-
-def generate_compatible_room(y, x, direction_from_player: str):
-    required_exit = _get_opposite_direction(direction_from_player)
-    compatible_room = None
-    while compatible_room is None:
-        temp_room = generate_random_room(y, x)
-        if temp_room.exits.get(required_exit, False):
-            compatible_room = temp_room
-    return compatible_room
-
-def generate_unique_proposals(y, x, direction_from_player: str, count=3):
-    seen = set(); props = []; tries = 0; max_tries = 80
-    while len(props) < count and tries < max_tries:
-        r = generate_compatible_room(y, x, direction_from_player)
-        if r.name.upper() not in seen:
-            seen.add(r.name.upper()); props.append(r)
-        tries += 1
-    return props
-
-def setup_dungeon(rows=9, cols=6):
-    grid = [[None for _ in range(cols)] for _ in range(rows)]
-    start_exits = get_exits_from_template("ENTRANCE HALL")
-    start = Room(1, 8, "standard",
-                 resources={"bread": 1, "coins": 1, "gems": 0, "keys": 0, "dice": 1, "tools": []},
-                 exits=start_exits, name="ENTRANCE HALL", entrance_fee=0)
-    start.visited = True
-    grid[8][1] = start
-    end_exits = get_exits_from_template("ANTECHAMBER")
-    end = Room(2, 0, "special",
-               resources={"bread": 3, "coins": 5, "gems": 5, "keys": 2, "dice": 3, "tools": []},
-               exits=end_exits, name="ANTECHAMBER", entrance_fee=0)
-    grid[0][2] = end
-    return grid
 
 #  Dossiers/Images 
 
@@ -209,9 +69,149 @@ CARTOGRAPHIE_IMAGES_SALLES = {
 }
 
 
+TOUS_NOMS_SALLES = [name for name in DEFAULT_EXITS.keys() if name not in {"ENTRANCE HALL", "ANTECHAMBER"}]
+POOL_OUTILS = ["Crowbar", "Lockpick", "Torch", "Rope", "Goggles"]
+
+# 1) Modèles de Jeu
+
+
+class Chambre:
+    def __init__(self, x, y, type_salle="standard", ressources=None, sorties=None, nom="SALLE", frais_entrée=0):
+        self.pos_x = x
+        self.pos_y = y
+        self.type_salle = type_salle
+        self.cout = 1 if type_salle == "special" else 0
+        self.ressources = ressources if ressources is not None else {
+            "bread": 0, "coins": 0, "gems": 0, "keys": 0, "dice": 0, "tools": []
+        }
+        self.sorties = sorties if sorties is not None else {}
+        self.visitee = False
+        self.nom = nom
+        self.frais_entrée = max(0, int(frais_entrée))
+
+class Joueur:
+    def __init__(self, pas_départ: int):
+        self.pas_restants = pas_départ
+        self.inventaire = {"bread": 0, "coins": 5, "gems": 1, "keys": 2, "dice": 3}
+        self.ceinture_outils = ["Shovel", "Metal Detector"]
+        self.pos_y = 8
+        self.pos_x = 1
+
+    def se_déplacer(self):
+        if self.pas_restants > 0:
+            self.pas_restants -= 1
+            return True
+        return False
+
+    def payer(self, article, montant):
+        if self.inventaire.get(article, 0) >= montant:
+            self.inventaire[article] -= montant
+            return True
+        return False
+
+    def collecter(self, salle):
+        if salle.visitee:
+            return {}
+        gagne = {}
+        for k in ("bread", "coins", "gems", "keys", "dice"):
+            v = salle.ressources.get(k, 0)
+            if v > 0:
+                self.inventaire[k] = self.inventaire.get(k, 0) + v
+                gagne[k] = v
+                salle.ressources[k] = 0
+        outils = salle.ressources.get("tools", [])
+        if outils:
+            gagne["tools"] = []
+            for t in outils:
+                if t not in self.ceinture_outils:
+                    self.ceinture_outils.append(t)
+                gagne["tools"].append(t)
+            salle.ressources["tools"] = []
+        salle.visitee = True
+        return gagne
 
 
 
+# 2) Génération de Donjon
 
 
-    
+def _obtenir_direction_opposée(direction):
+    opposites = {"haut": "bas", "bas": "haut", "gauche": "droite", "droite": "gauche"}
+    return opposites.get(direction)
+
+def obtenir_sorties_depuis_modele(nom_salle: str) -> dict:
+    modele = DEFAULT_EXITS.get(nom_salle.upper(), {"haut": 1, "bas": 1, "gauche": 1, "droite": 1})
+    return {d: bool(v) for d, v in modele.items()}
+
+def générer_salle_aléatoire(y, x):
+    est_spéciale = random.random() < 0.3
+    type_salle = "special" if est_spéciale else "standard"
+    nom = random.choice(TOUS_NOMS_SALLES)
+    sorties = obtenir_sorties_depuis_modele(nom)
+
+    base = {"bread": random.randint(0, 1),
+            "dice": random.randint(0, 1),
+            "coins": random.randint(0, 2),
+            "gems": 0,
+            "keys": 0,
+            "tools": []}
+
+    if est_spéciale:
+        base["gems"] = random.randint(1, 2)
+        base["keys"] = random.randint(0, 1)
+
+    if nom == "BEDROOM":
+        base["dice"] += 2
+    elif nom == "DEN":
+        base["gems"] += 1
+    elif nom == "GUEST BEDROOM":
+        base["bread"] += 10
+    elif nom == "NOOK":
+        base["keys"] += 1
+    elif nom == "STOREROOM":
+        base["keys"] += 1; base["gems"] += 1; base["coins"] += 1
+
+    chance_outil = 0.15 if est_spéciale else 0.10
+    if random.random() < chance_outil:
+        n_outils = 2 if (est_spéciale and random.random() < 0.25) else 1
+        base["tools"] = random.sample(POOL_OUTILS, k=min(n_outils, len(POOL_OUTILS)))
+
+    frais_entrée = 0
+    if random.random() < (0.22 if est_spéciale else 0.15):
+        frais_entrée = 1 if not est_spéciale else random.choice([1, 2, 3])
+
+    return Chambre(x, y, type_salle=type_salle, ressources=base, sorties=sorties, nom=nom, frais_entrée=frais_entrée)
+
+def générer_salle_compatible(y, x, direction_depuis_joueur: str):
+    sortie_requise = _obtenir_direction_opposée(direction_depuis_joueur)
+    salle_compatible = None
+    while salle_compatible is None:
+        salle_temp = générer_salle_aléatoire(y, x)
+        if salle_temp.sorties.get(sortie_requise, False):
+            salle_compatible = salle_temp
+    return salle_compatible
+
+def générer_propositions_uniques(y, x, direction_depuis_joueur: str, compte=3):
+    vu = set(); props = []; essais = 0; max_essais = 80
+    while len(props) < compte and essais < max_essais:
+        r = générer_salle_compatible(y, x, direction_depuis_joueur)
+        if r.nom.upper() not in vu:
+            vu.add(r.nom.upper()); props.append(r)
+        essais += 1
+    return props
+
+def configurer_donjon(lignes=9, colonnes=6):
+    grille = [[None for _ in range(colonnes)] for _ in range(lignes)]
+    sorties_départ = obtenir_sorties_depuis_modele("ENTRANCE HALL")
+    départ = Chambre(1, 8, "standard",
+                  ressources={"bread": 1, "coins": 1, "gems": 0, "keys": 0, "dice": 1, "tools": []},
+                  sorties=sorties_départ, nom="ENTRANCE HALL", frais_entrée=0)
+    départ.visitee = True
+    grille[8][1] = départ
+    sorties_fin = obtenir_sorties_depuis_modele("ANTECHAMBER")
+    fin = Chambre(2, 0, "special",
+                ressources={"bread": 3, "coins": 5, "gems": 5, "keys": 2, "dice": 3, "tools": []},
+                sorties=sorties_fin, nom="ANTECHAMBER", frais_entrée=0)
+    grille[0][2] = fin
+    return grille
+
