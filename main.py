@@ -625,4 +625,84 @@ def _gérer_sélection_salle_draft(self, index):
         self.action = None
         self.cible = None
         self.propositions = []
-        self.direction_selectionnee = None   
+        self.direction_selectionnee = None 
+def _gérer_redessiner(self):
+        if self.action == "draft" and self.joueur.inventaire["dice"] > 0 and self.cible:
+            if not self.direction_selectionnee:
+                self.boite_message = ("Erreur", "Direction de draft manquante pour le Redraw.")
+                return
+            self.joueur.inventaire["dice"] -= 1
+            y, x = self.cible
+            self.propositions = générer_propositions_uniques(y, x, self.direction_selectionnee, compte=3)
+        else:
+            self.boite_message = ("Redraw", "Pas de dé restant ou pas en mode Draft.")
+
+def gérer_événement(self, événement):
+        if self.boite_message:
+            if événement.type == pygame.MOUSEBUTTONDOWN and self.rect_ok_boite_message.collidepoint(événement.pos):
+                self.boite_message = None
+            if événement.type == pygame.KEYDOWN and événement.key == pygame.K_RETURN:
+                 self.boite_message = None
+            return
+
+        if événement.type == pygame.KEYDOWN:
+            if événement.key == pygame.K_UP: self._gérer_mouvement("haut")
+            elif événement.key == pygame.K_DOWN: self._gérer_mouvement("bas")
+            elif événement.key == pygame.K_LEFT: self._gérer_mouvement("gauche")
+            elif événement.key == pygame.K_RIGHT: self._gérer_mouvement("droite")
+            elif self.action == "draft":
+                if événement.key == pygame.K_1: self._gérer_sélection_salle_draft(0)
+                elif événement.key == pygame.K_2: self._gérer_sélection_salle_draft(1)
+                elif événement.key == pygame.K_3: self._gérer_sélection_salle_draft(2)
+                elif événement.key == pygame.K_d: self._gérer_redessiner()
+        
+        elif événement.type == pygame.MOUSEBUTTONDOWN and événement.button == 1:
+            if self.RECT_REDESSINER_BOUTON.collidepoint(événement.pos) and self.action == "draft" and self.joueur.inventaire["dice"] > 0:
+                self._gérer_redessiner()
+            
+            elif self.action == "draft":
+                for i, rect in enumerate(self.RECTS_CARTES):
+                    if rect.collidepoint(événement.pos):
+                        self._gérer_sélection_salle_draft(i)
+                        break
+
+def exécuter(self):
+        running = True
+        while running:
+            for événement in pygame.event.get():
+                if événement.type == pygame.QUIT:
+                    running = False
+                self.gérer_événement(événement)
+
+            self.ecran.fill(COULEUR_FOND_CARTE_PRINCIPALE)
+            self._dessiner_carte()
+            self._dessiner_panneau()
+            
+            pygame.display.flip()
+            HORLOGE.tick(IPS)
+
+        pygame.quit()
+        sys.exit()
+
+
+# 4) Exécution Pygame
+
+
+
+if __name__ == "__main__":
+    if not os.path.isdir(DOSSIER_IMAGE):
+        print(f"ATTENTION: Le dossier d'images '{DOSSIER_IMAGE}' n'existe pas. Les placeholders seront utilisés.")
+    
+    try:
+        app = ApplicationPygame(ECRAN)
+        
+        # APPEL DE L'INTRODUCTION :
+        app.afficher_introduction() 
+        
+        # DÉMARRAGE DU JEU PRINCIPAL :
+        app.exécuter()
+        
+    except Exception as e:
+        print(f"Une erreur fatale s'est produite: {e}")
+        pygame.quit()
+        sys.exit()        
