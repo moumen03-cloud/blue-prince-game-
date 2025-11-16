@@ -46,7 +46,7 @@ CARTOGRAPHIE_IMAGES_SALLES = {
     "WALK IN CLOSET": os.path.join(DOSSIER_IMAGE, "WALK IN CLOSET.png"),
     "ATTIC": os.path.join(DOSSIER_IMAGE, "ATTIC.png"),
     "STOREROOM": os.path.join(DOSSIER_IMAGE, "STOREROOM.png"),
-    "NOOK": os.path.join(DOSSIER_IMAGE, "NOOK.png"),
+    "NOOK": os.path.join(DOSSIER_IMAGE, "nook.png.png"),
     "GARAGE": os.path.join(DOSSIER_IMAGE, "GARAGE.png"),
     "MUSIC ROOM": os.path.join(DOSSIER_IMAGE, "MUSIC ROOM.png"),
     "LOCKER ROOM": os.path.join(DOSSIER_IMAGE, "LOCKER ROOM.png"),
