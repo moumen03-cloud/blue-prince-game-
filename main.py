@@ -1,20 +1,21 @@
-import os
-import random
-import pygame
 import sys
+import pygame
+import random
+import os
 from chambres_portes import DEFAULT_EXITS
+
 
 # Configuration de Pygame
 pygame.init()
 
-#  Constantes Pygame 
+# Constantes Pygame
 FENETRE_L, FENETRE_H = 1200, 720
 ECRAN = pygame.display.set_mode((FENETRE_L, FENETRE_H))
 pygame.display.set_caption(" Draft des Salles (Pygame)")
 HORLOGE = pygame.time.Clock()
 IPS = 60
 
-#  Couleurs 
+# Couleurs
 COULEUR_TEXTE = (224, 224, 224)
 COULEUR_ACCENT = (0, 255, 0)
 COULEUR_FOND_PANNEAU = (30, 30, 30)
@@ -26,7 +27,7 @@ BLEU = (30, 30, 40)
 BLEU_FONCE = (40, 60, 100)
 MARRON_FONCE = (70, 45, 30)
 
-#  Dossiers/Images 
+# Dossiers/Images
 
 DOSSIER_IMAGE = "images projet"
 CHEMIN_IMAGE_FOND = os.path.join(DOSSIER_IMAGE, "image arriere .plan.png")
@@ -34,8 +35,8 @@ CHEMIN_IMAGE_FOND = os.path.join(DOSSIER_IMAGE, "image arriere .plan.png")
 # Les images de salle
 CHEMIN_IMAGE_INTRO = os.path.join(DOSSIER_IMAGE, "image introduction du jeu.png")
 CARTOGRAPHIE_IMAGES_SALLES = {
-   "THE FOUNDATION": os.path.join(DOSSIER_IMAGE, "THE FOUNDATION.png"),
-    "ENTRANCE HALL": os.path.join(DOSSIER_IMAGE, "ENTRANCE HALL.png"), 
+    "THE FOUNDATION": os.path.join(DOSSIER_IMAGE, "THE FOUNDATION.png"),
+    "ENTRANCE HALL": os.path.join(DOSSIER_IMAGE, "ENTRANCE HALL.png"),
     "SPARE ROOM": os.path.join(DOSSIER_IMAGE, "SPARE ROOM.png"),
     "ROTUNDA": os.path.join(DOSSIER_IMAGE, "ROTUNDA.png"),
     "PARLOR": os.path.join(DOSSIER_IMAGE, "PARLOR.png"),
@@ -62,18 +63,18 @@ CARTOGRAPHIE_IMAGES_SALLES = {
     "STUDY": os.path.join(DOSSIER_IMAGE, "STUDY.png"),
     "LIBRARY": os.path.join(DOSSIER_IMAGE, "LIBRARY.png"),
     "CHAMBER OF MIRRORS": os.path.join(DOSSIER_IMAGE, "CHAMBER OF MIRRORS.png"),
-    "THE POOL": os.path.join(DOSSIER_IMAGE, "THE POOL.png"), 
+    "THE POOL": os.path.join(DOSSIER_IMAGE, "THE POOL.png"),
     "DRAFTING STUDIO": os.path.join(DOSSIER_IMAGE, "DRAFTING STUDIO.png"),
     "UTILITY CLOSET": os.path.join(DOSSIER_IMAGE, "UTILITY CLOSET.png"),
-    "BOILER ROOM": os.path.join(DOSSIER_IMAGE, "BOILER ROOM.png"), 
+    "BOILER ROOM": os.path.join(DOSSIER_IMAGE, "BOILER ROOM.png"),
     "PUMP ROOM": os.path.join(DOSSIER_IMAGE, "PUMP ROOM.png"),
     "SECURITY": os.path.join(DOSSIER_IMAGE, "SECURITY.png"),
-    "WORKSHOP": os.path.join(DOSSIER_IMAGE, "WORKSHOP.png"), 
+    "WORKSHOP": os.path.join(DOSSIER_IMAGE, "WORKSHOP.png"),
     "LABORATORY": os.path.join(DOSSIER_IMAGE, "LABORATORY.png"),
-    "SAUNA": os.path.join(DOSSIER_IMAGE, "SAUNA.png"), 
-    "COAT CHECK": os.path.join(DOSSIER_IMAGE, "COAT CHECK.png"), 
-    "MAIL ROOM": os.path.join(DOSSIER_IMAGE, "MAIL ROOM.png"), 
-    "FREEZER": os.path.join(DOSSIER_IMAGE, "FREEZER.png"), 
+    "SAUNA": os.path.join(DOSSIER_IMAGE, "SAUNA.png"),
+    "COAT CHECK": os.path.join(DOSSIER_IMAGE, "COAT CHECK.png"),
+    "MAIL ROOM": os.path.join(DOSSIER_IMAGE, "MAIL ROOM.png"),
+    "FREEZER": os.path.join(DOSSIER_IMAGE, "FREEZER.png"),
     "DINNING ROOM": os.path.join(DOSSIER_IMAGE, "DINNING ROOM.png"),
     "OBSERVATORY": os.path.join(DOSSIER_IMAGE, "OBSERVATORY.png"),
     "CONFERENCE ROOM": os.path.join(DOSSIER_IMAGE, "CONFERENCE ROOM.png"),
@@ -91,11 +92,11 @@ CARTOGRAPHIE_IMAGES_SALLES = {
     "MASTER BEDROOM": os.path.join(DOSSIER_IMAGE, "MASTER BEDROOM.png"),
 
     # pièces marrons
-    "HALLWAY": os.path.join(DOSSIER_IMAGE, "HALLWAY.png"), 
+    "HALLWAY": os.path.join(DOSSIER_IMAGE, "HALLWAY.png"),
     "WEST WING HALL": os.path.join(DOSSIER_IMAGE, "WEST WING HALL.png"),
     "EAST WING HALL": os.path.join(DOSSIER_IMAGE, "EAST WING HALL.png"),
-    "CORRIDOR": os.path.join(DOSSIER_IMAGE, "CORRIDOR.png"), 
-    "PASSAGE WAY": os.path.join(DOSSIER_IMAGE, "PASSAGEWAY.png"), 
+    "CORRIDOR": os.path.join(DOSSIER_IMAGE, "CORRIDOR.png"),
+    "PASSAGE WAY": os.path.join(DOSSIER_IMAGE, "PASSAGEWAY.png"),
     "SECRET PASSAGE": os.path.join(DOSSIER_IMAGE, "SECRET PASSAGE.png"),
     "FOYER": os.path.join(DOSSIER_IMAGE, "FOYER.png"),
     "GREAT HALL": os.path.join(DOSSIER_IMAGE, "GREAT HALL.png"),
@@ -131,7 +132,20 @@ CARTOGRAPHIE_IMAGES_SALLES = {
     "FURNACE": os.path.join(DOSSIER_IMAGE, "FURNACE.png")
 }
 
-TOUS_NOMS_SALLES = [name for name in DEFAULT_EXITS.keys() if name not in {"ENTRANCE HALL", "ANTECHAMBER"}]
+
+
+# [Règle 1: Rareté] Degré de rareté (0=Commun, 3=Ultra-rare).
+
+CARTOGRAPHIE_RARETE = {
+    "ANTECHAMBER": 3,
+    "CHAMBER OF MIRRORS": 1,
+    "VAULT": 2,
+    "SECRET GARDEN": 1,
+    "SECRET PASSAGE": 1,
+}
+
+# [Règle 2: Retrait de la Pioche] Liste des noms de salles disponibles pour le draft.
+PIECES_DISPONIBLES = [name for name in DEFAULT_EXITS.keys() if name not in {"ENTRANCE HALL", "ANTECHAMBER"}]
 POOL_OUTILS = ["Crowbar", "Lockpick", "Torch", "Rope", "Goggles"]
 
 # 1) Modèles de Jeu
@@ -193,9 +207,7 @@ class Joueur:
         return gagne
 
 
-
-# 2) Génération de Donjon
-
+# 2)  Génération de Donjon 
 
 def _obtenir_direction_opposée(direction):
     opposites = {"haut": "bas", "bas": "haut", "gauche": "droite", "droite": "gauche"}
@@ -206,9 +218,34 @@ def obtenir_sorties_depuis_modele(nom_salle: str) -> dict:
     return {d: bool(v) for d, v in modele.items()}
 
 def générer_salle_aléatoire(y, x):
+    global PIECES_DISPONIBLES
+    
+    if not PIECES_DISPONIBLES:
+        # Si la pioche est vide, retourne une salle standard par défaut 
+        return Chambre(x, y, nom="DEPOT", sorties={"haut": 1, "bas": 1, "gauche": 1, "droite": 1}, frais_entrée=0)
+
+    #  Application de la rareté 
+    # Calcule les poids de chaque salle
+    noms_disponibles = list(PIECES_DISPONIBLES)
+    poids_tirage = []
+    
+    for nom in noms_disponibles:
+        rareté = CARTOGRAPHIE_RARETE.get(nom.upper(), 0)
+        poids = 1.0 / (3.0 ** rareté) 
+        poids_tirage.append(poids)
+        
+    # S'assure qu'il reste au moins une salle à choisir
+    if sum(poids_tirage) == 0:
+        # Cas extrême où toutes les salles restantes auraient une rareté infinie (non possible ici, mais sécurité)
+        nom = random.choice(noms_disponibles)
+    else:
+        # Sélectionne une salle pondérée par la rareté
+        nom = random.choices(noms_disponibles, weights=poids_tirage, k=1)[0]
+ 
+
+    # Crée la salle (le retrait de la pioche se fera uniquement si la salle est choisie par le joueur)
     est_spéciale = random.random() < 0.3
     type_salle = "special" if est_spéciale else "standard"
-    nom = random.choice(TOUS_NOMS_SALLES)
     sorties = obtenir_sorties_depuis_modele(nom)
 
     base = {"bread": random.randint(0, 1),
@@ -222,6 +259,7 @@ def générer_salle_aléatoire(y, x):
         base["gems"] = random.randint(1, 2)
         base["keys"] = random.randint(0, 1)
 
+    # Ajustement des ressources spécifiques à la salle (non modifiées)
     if nom == "BEDROOM":
         base["dice"] += 2
     elif nom == "DEN":
@@ -247,15 +285,25 @@ def générer_salle_aléatoire(y, x):
 def générer_salle_compatible(y, x, direction_depuis_joueur: str):
     sortie_requise = _obtenir_direction_opposée(direction_depuis_joueur)
     salle_compatible = None
+    
+        # Règle 3: Condition de placement (implémentation de base: doit avoir la sortie requise)
     while salle_compatible is None:
         salle_temp = générer_salle_aléatoire(y, x)
+        
+        # Conditions de placement personnalisées (Exemple: Hallway/Passage doit être central)
+        if salle_temp.nom.upper() == "HALLWAY" and (x == 0 or x == 4 or y == 0 or y == 8):
+             continue # Ne permet pas les Hallways aux extrémités (ajustez selon vos règles)
+
+        # Condition de compatibilité de sortie
         if salle_temp.sorties.get(sortie_requise, False):
             salle_compatible = salle_temp
+            
     return salle_compatible
 
 def générer_propositions_uniques(y, x, direction_depuis_joueur: str, compte=3):
     vu = set(); props = []; essais = 0; max_essais = 80
     while len(props) < compte and essais < max_essais:
+        # gère la rareté et les contraintes de placement
         r = générer_salle_compatible(y, x, direction_depuis_joueur)
         if r.nom.upper() not in vu:
             vu.add(r.nom.upper()); props.append(r)
@@ -270,18 +318,33 @@ def configurer_donjon(lignes=9, colonnes=6):
                   sorties=sorties_départ, nom="ENTRANCE HALL", frais_entrée=0)
     départ.visitee = True
     grille[8][1] = départ
+    
+    # Retirer les pièces de départ/fin de la pioche 
+    try:
+        PIECES_DISPONIBLES.remove("ENTRANCE HALL")
+    except ValueError:
+        pass
+    
     sorties_fin = obtenir_sorties_depuis_modele("ANTECHAMBER")
     fin = Chambre(2, 0, "special",
                 ressources={"bread": 3, "coins": 5, "gems": 5, "keys": 2, "dice": 3, "tools": []},
                 sorties=sorties_fin, nom="ANTECHAMBER", frais_entrée=0)
     grille[0][2] = fin
+    
+    try:
+        PIECES_DISPONIBLES.remove("ANTECHAMBER")
+    except ValueError:
+        pass
+        
     return grille
+
 
 # 3) Interface Utilisateur Pygame
 
 
 class ApplicationPygame:
-
+    
+    
     def afficher_introduction(self):
         """Affiche l'écran d'introduction et attend que l'utilisateur appuie sur ENTRÉE."""
         # Tenter de charger l'image d'introduction
@@ -307,7 +370,7 @@ class ApplicationPygame:
                     if événement.key == pygame.K_RETURN:
                         intro = False # Quitter la boucle d'intro si ENTRÉE est pressée
 
-            #  Dessin de l'écran d'introduction 
+            # Dessin de l'écran d'introduction
             if image_intro:
                 self.ecran.blit(image_intro, (0, 0))
             else:
@@ -327,6 +390,7 @@ class ApplicationPygame:
             
             pygame.display.flip()
             HORLOGE.tick(IPS)
+
     def __init__(self, ecran):
         self.ecran = ecran
         self.LIGNES, self.COLONNES = 9, 5
@@ -338,12 +402,12 @@ class ApplicationPygame:
         self.police_tg = pygame.font.Font(None, 48)
         self.police_symbole = pygame.font.SysFont('Segoe UI Emoji', 24)
 
-        # --- Définitions des dimensions ---
+        # Définitions des dimensions
         
         # 1. TAILLES FIXES ET AGRANDIES
         self.TAILLE_IMAGE_SALLE_CARTE = 64
 
-        self.TAILLE_IMAGE_PROPOSITION_CARTE = 180 
+        self.TAILLE_IMAGE_PROPOSITION_CARTE = 180
 
         # 2. DIMENSIONS DE LA CARTE (MAP_RECT -> RECT_CARTE)
         self.MARGE = 20
@@ -369,16 +433,16 @@ class ApplicationPygame:
         ECART_CARTES = 5
         self.CADRE_CARTE_L = (ESPACE_CARTES_L - 5 * ECART_CARTES) // 3
         
-        HAUTEUR_EXTRA_CADRE = 20
-        hauteur_totale_carte = self.TAILLE_IMAGE_PROPOSITION_CARTE + 3 * HAUTEUR_EXTRA_CADRE + 2 * 60
+        #  la hauteur pour un meilleur ajustement du texte
+        HAUTEUR_TOTALE_CARTE = self.TAILLE_IMAGE_PROPOSITION_CARTE + 200 
         
         base_x = self.RECT_PANNEAU.x + 24
         for i in range(3):
             x = base_x + i * (self.CADRE_CARTE_L + ECART_CARTES)
             y = self.RECT_PANNEAU.y + 200 + 80
-            self.RECTS_CARTES.append(pygame.Rect(x, y, self.CADRE_CARTE_L, hauteur_totale_carte))
+            self.RECTS_CARTES.append(pygame.Rect(x, y, self.CADRE_CARTE_L, HAUTEUR_TOTALE_CARTE))
 
-        self.images = self._charger_images() 
+        self.images = self._charger_images()
         
         self.action = None
         self.cible = None
@@ -421,6 +485,7 @@ class ApplicationPygame:
                 cache_images[f"{nom}_proposition"] = self._créer_surface_substitut(nom, self.TAILLE_IMAGE_PROPOSITION_CARTE)
 
         return cache_images
+
     def _créer_surface_substitut(self, nom, taille, est_spéciale=False):
         surface = pygame.Surface((taille, taille))
         surface.fill(BLEU)
@@ -441,7 +506,6 @@ class ApplicationPygame:
         rect_texte = surface_texte.get_rect(**{ancre: pos})
         surface.blit(surface_texte, rect_texte)
         return rect_texte
-
 
     def _dessiner_carte(self):
         pygame.draw.rect(self.ecran, COULEUR_FOND_CARTE_PRINCIPALE, self.RECT_CARTE)
@@ -490,7 +554,7 @@ class ApplicationPygame:
     def _dessiner_panneau(self):
         pygame.draw.rect(self.ecran, COULEUR_FOND_PANNEAU, self.RECT_PANNEAU)
         
-        # --- Inventaire et Ressources ---
+        # Inventaire et Ressources 
         inv_rect = pygame.Rect(self.RECT_PANNEAU.x + 24, self.RECT_PANNEAU.y + 16, (self.RECT_PANNEAU.width - 48) // 2, 180)
         self._dessiner_texte(self.ecran, "INVENTAIRE", inv_rect.topleft, self.police_g, COULEUR_TEXTE)
         
@@ -521,7 +585,8 @@ class ApplicationPygame:
 
         loot_rect = pygame.Rect(self.RECT_PANNEAU.x + 24, self.RECT_PANNEAU.y + 16 + 182, self.RECT_PANNEAU.width - 48, 24)
         self._dessiner_texte(self.ecran, f"Dernier butin : {self.dernier_butin_texte}", loot_rect.topleft, self.police_m, (255, 211, 105))
-        # --- Zone de Draft ---
+        
+        # Zone de Draft 
         draft_y = self.RECT_PANNEAU.y + 240
         
         titre_texte = "Explorer ou attendre"
@@ -535,7 +600,7 @@ class ApplicationPygame:
         if self.action == "draft":
             pygame.draw.rect(self.ecran, COULEUR_ACCENT if self.joueur.inventaire["dice"] > 0 else (60, 60, 60), self.RECT_REDESSINER_BOUTON, 0, 5)
             self._dessiner_texte(self.ecran, "🎲 Redraw (D)", self.RECT_REDESSINER_BOUTON.center, self.police_m, COULEUR_FOND_CARTE_PRINCIPALE, ancre="center")
-        
+            
             for i, r in enumerate(self.propositions):
                 rect_carte = self.RECTS_CARTES[i]
                 
@@ -554,23 +619,29 @@ class ApplicationPygame:
                 if r.type_salle == "special": lines.append(f"COÛT: {r.cout}C")
                 if r.frais_entrée > 0: lines.append(f"FRAIS: {r.frais_entrée}C POUR ENTRER")
                 
-                desc_y = rect_image.bottom + 10
-                for ligne in lines:
-                    self._dessiner_texte(self.ecran, ligne, (rect_carte.left + 8, desc_y), self.police_m, COULEUR_TEXTE)
-                    desc_y += 20
+                # ajustement des lignes : Utilisation de la hauteur de la police
+                rareté = CARTOGRAPHIE_RARETE.get(r.nom.upper(), 0)
+                lines.append(f"RARETÉ: {rareté}") # Affiche le degré de rareté
                 
+                hauteur_ligne = self.police_m.get_height() + 2 # Hauteur de la police + 2px de marge
+                desc_y = rect_image.bottom + 10
+                for j, ligne in enumerate(lines):
+                    y_pos = desc_y + j * hauteur_ligne
+                    self._dessiner_texte(self.ecran, ligne, (rect_carte.left + 8, y_pos), self.police_m, COULEUR_TEXTE)
+
                 hint_rect = pygame.Rect(rect_carte.left, rect_carte.bottom - 25, rect_carte.width, 20)
                 self._dessiner_texte(self.ecran, f"PRESSEZ [{i+1}]", hint_rect.center, self.police_p, COULEUR_ACCENT, ancre="center")
 
         if self.boite_message:
-            self._dessiner_boîte_message()  
-def _dessiner_boîte_message(self):
+            self._dessiner_boîte_message()
+
+    def _dessiner_boîte_message(self):
         overlay = pygame.Surface((FENETRE_L, FENETRE_H), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 180))
         self.ecran.blit(overlay, (0, 0))
 
         titre, texte = self.boite_message
-        boite_l, boite_h = 400, 200
+        boite_l, boite_h = 800, 200
         rect_boite = pygame.Rect((FENETRE_L - boite_l) // 2, (FENETRE_H - boite_h) // 2, boite_l, boite_h)
         pygame.draw.rect(self.ecran, COULEUR_FOND_PANNEAU, rect_boite, 0, 10)
         pygame.draw.rect(self.ecran, COULEUR_ACCENT, rect_boite, 3, 10)
@@ -583,7 +654,7 @@ def _dessiner_boîte_message(self):
         self._dessiner_texte(self.ecran, "OK", rect_ok.center, self.police_m, COULEUR_FOND_CARTE_PRINCIPALE, ancre="center")
         self.rect_ok_boite_message = rect_ok
 
-def _définir_dernier_butin(self, gagne: dict):
+    def _définir_dernier_butin(self, gagne: dict):
         parties = []
         for k in ("pieces", "coins", "gems", "keys", "dice"):
             if gagne.get(k, 0):
@@ -592,7 +663,18 @@ def _définir_dernier_butin(self, gagne: dict):
             parties.append("outils: " + ", ".join(gagne["tools"]))
         self.dernier_butin_texte = ", ".join(parties) if parties else "—"
 
-def _gérer_sélection_salle_draft(self, index):
+    def _vérifier_victoire(self):
+        """Vérifie si le joueur est entré dans la salle ANTECHAMBER (position 0, 2)."""
+        if self.joueur.pos_y == 0 and self.joueur.pos_x == 2:
+            self.boite_message = ("VICTOIRE !", "Bravo champion, vous avez atteint l'ANTECHAMBER !")
+            self.joueur.pas_restants = 0
+            self.action = None
+            return True
+        return False
+
+    def _gérer_sélection_salle_draft(self, index):
+        global PIECES_DISPONIBLES
+        
         if index >= len(self.propositions):
             return
         
@@ -600,11 +682,11 @@ def _gérer_sélection_salle_draft(self, index):
         salle_choisie = self.propositions[index]
 
         if not self.joueur.se_déplacer():
-            self.boite_message = ("Déplacement Impossible", "Plus de pas restants pour poser la pièce!")
+            self.boite_message = ("Déplacement Impossible", "Plus de pas restants !")
             self.action = None; return
 
         if salle_choisie.type_salle == "special" and not self.joueur.payer("coins", 3):
-            self.boite_message = ("Pièce Spéciale", "Pas assez de Pièces (Coût: 3 Pièce). Annulation du placement.")
+            self.boite_message = ("Pièce Spéciale", "Pas assez de Pièces (3 Pièce). Annulation du placement.")
             self.joueur.pas_restants += 1
             self.action = None; return
 
@@ -614,6 +696,12 @@ def _gérer_sélection_salle_draft(self, index):
                 self.joueur.pas_restants += 1
                 self.action = None; return
 
+        # Règle 2: Retrait de la Pioche 
+        # Si la salle est placée, elle est retirée des options de tirage futures.
+        if salle_choisie.nom.upper() in PIECES_DISPONIBLES:
+            PIECES_DISPONIBLES.remove(salle_choisie.nom.upper())
+    
+
         self.donjon[y][x] = salle_choisie
         self.joueur.pos_y, self.joueur.pos_x = y, x
 
@@ -621,12 +709,71 @@ def _gérer_sélection_salle_draft(self, index):
         if gagne:
             self._définir_dernier_butin(gagne)
             self.boite_message = ("Collecté", f"Vous avez trouvé : {gagne}")
+            
+        # Vérifie la victoire après avoir placé la salle
+        if self._vérifier_victoire():
+            return
 
         self.action = None
         self.cible = None
         self.propositions = []
-        self.direction_selectionnee = None 
-def _gérer_redessiner(self):
+        self.direction_selectionnee = None
+
+        
+
+    def _gérer_mouvement(self, cle):
+        py, px = self.joueur.pos_y, self.joueur.pos_x
+        
+        if self.action == "draft":
+            self.action = None
+            self.cible = None
+            self.propositions = []
+            self.direction_selectionnee = None
+            return
+
+        dy, dx = {"haut": (-1,0), "bas": (1,0), "gauche": (0,-1), "droite": (0,1)}[cle]
+        ny, nx = py+dy, px+dx
+        
+        if not (0 <= ny < self.LIGNES and 0 <= nx < self.COLONNES):
+            return
+        
+        salle_actuelle = self.donjon[py][px]
+        
+        if self.donjon[ny][nx] is None:
+            if salle_actuelle and salle_actuelle.sorties.get(cle, False):
+                self.action = "draft"
+                self.direction_selectionnee = cle
+                self.propositions = générer_propositions_uniques(ny, nx, cle, compte=3)
+                self.cible = (ny, nx)
+            else:
+                self.boite_message = ("Bloqué", "Impossible de construire une pièce ici (pas de sortie dans la pièce actuelle).")
+        else:
+            salle_cible = self.donjon[ny][nx]
+            salle_actuelle_ouverte = salle_actuelle.sorties.get(cle, False)
+            salle_cible_ouverte = salle_cible.sorties.get(_obtenir_direction_opposée(cle), False)
+            
+            if salle_actuelle_ouverte and salle_cible_ouverte:
+                if self.joueur.se_déplacer():
+                    self.joueur.pos_y, self.joueur.pos_x = ny, nx
+                    gagne = self.joueur.collecter(self.donjon[ny][nx])
+                    if gagne:
+                        self._définir_dernier_butin(gagne)
+                        self.boite_message = ("Collecté", f"Vous avez trouvé : {gagne}")
+
+                    # Vérifie la victoire après le déplacement
+                    if self._vérifier_victoire():
+                        return
+                else:
+                    self.boite_message = ("Déplacement Impossible", "Plus de pas restants!")
+            else:
+                self.boite_message = ("Bloqué", "Ce mur est un cul-de-sac (portes non alignées).")
+        
+        if self.action != "draft":
+            self.propositions = []
+            self.cible = None
+            self.direction_selectionnee = None
+
+    def _gérer_redessiner(self):
         if self.action == "draft" and self.joueur.inventaire["dice"] > 0 and self.cible:
             if not self.direction_selectionnee:
                 self.boite_message = ("Erreur", "Direction de draft manquante pour le Redraw.")
@@ -637,7 +784,7 @@ def _gérer_redessiner(self):
         else:
             self.boite_message = ("Redraw", "Pas de dé restant ou pas en mode Draft.")
 
-def gérer_événement(self, événement):
+    def gérer_événement(self, événement):
         if self.boite_message:
             if événement.type == pygame.MOUSEBUTTONDOWN and self.rect_ok_boite_message.collidepoint(événement.pos):
                 self.boite_message = None
@@ -666,7 +813,7 @@ def gérer_événement(self, événement):
                         self._gérer_sélection_salle_draft(i)
                         break
 
-def exécuter(self):
+    def exécuter(self):
         running = True
         while running:
             for événement in pygame.event.get():
@@ -674,6 +821,12 @@ def exécuter(self):
                     running = False
                 self.gérer_événement(événement)
 
+            # Vérifie le Game Over/Victoire (si la boîte de message n'est pas déjà affichée)
+            if self.joueur.pas_restants <= 0 and self.boite_message is None:
+                # Vérifie si la fin n'est pas déjà l'ANTECHAMBER
+                if self.joueur.pos_y != 0 or self.joueur.pos_x != 2:
+                    self.boite_message = ("GAME OVER", "Plus de pas restants. Le jeu est terminé.")
+            
             self.ecran.fill(COULEUR_FOND_CARTE_PRINCIPALE)
             self._dessiner_carte()
             self._dessiner_panneau()
@@ -683,10 +836,8 @@ def exécuter(self):
 
         pygame.quit()
         sys.exit()
-
-
+    
 # 4) Exécution Pygame
-
 
 
 if __name__ == "__main__":
@@ -697,7 +848,7 @@ if __name__ == "__main__":
         app = ApplicationPygame(ECRAN)
         
         # APPEL DE L'INTRODUCTION :
-        app.afficher_introduction() 
+        app.afficher_introduction()
         
         # DÉMARRAGE DU JEU PRINCIPAL :
         app.exécuter()
@@ -705,4 +856,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"Une erreur fatale s'est produite: {e}")
         pygame.quit()
-        sys.exit()        
+        sys.exit()
