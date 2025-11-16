@@ -217,3 +217,89 @@ CARTOGRAPHIE_IMAGES_SALLES = {
     "WEIGHT ROOM": os.path.join(DOSSIER_IMAGE, "WEIGHTROOM.png"),
     "FURNACE": os.path.join(DOSSIER_IMAGE, "FURNACE.png")
 }
+   
+
+
+
+
+
+
+#Tirage aléatoire des pieces:
+# [Règle 1: Rareté] Degré de rareté (0=Commun, 3=Ultra-rare). Influence la probabilité de tirage (1 / 3^rareté).
+# J'ajoute la rareté à certaines salles pour l'exemple. Les salles non listées ont une rareté de 0.
+CARTOGRAPHIE_RARETE = {
+    "ANTECHAMBER": 3,
+    "CHAMBER OF MIRRORS": 1,
+    "VAULT": 2,
+    "SECRET GARDEN": 1,
+    "SECRET PASSAGE": 1,
+}
+
+# [Règle 2: Retrait de la Pioche] Liste des noms de salles disponibles pour le draft.
+# Initialisation avec toutes les salles sauf celles de départ/fin (qui sont placées manuellement).
+PIECES_DISPONIBLES = [name for name in DEFAULT_EXITS.keys() if name not in {"ENTRANCE HALL", "ANTECHAMBER"}]
+# Note: Nous gérons PIECES_DISPONIBLES de manière globale car Pygame est dans un module/script principal.
+POOL_OUTILS = ["Crowbar", "Lockpick", "Torch", "Rope", "Goggles"]
+
+
+def _gérer_sélection_salle_draft(self, index):
+        global PIECES_DISPONIBLES
+        
+        if index >= len(self.propositions):
+            return
+        
+        y, x = self.cible
+        salle_choisie = self.propositions[index]
+
+        if not self.joueur.se_déplacer():
+            self.boite_message = ("Déplacement Impossible", "Plus de pas restants !")
+            self.action = None; return
+
+        if salle_choisie.type_salle == "special" and not self.joueur.payer("coins", 3):
+            self.boite_message = ("Pièce Spéciale", "Pas assez de Pièces (3 Pièce). Annulation du placement.")
+            self.joueur.pas_restants += 1
+            self.action = None; return
+
+        if salle_choisie.frais_entrée > 0:
+            if not self.joueur.payer("coins", salle_choisie.frais_entrée):
+                self.boite_message = ("Salle Payante", f"Besoin de {salle_choisie.frais_entrée} pièces pour entrer. Placement annulé.")
+                self.joueur.pas_restants += 1
+                self.action = None; return
+            
+ # Règle 2: Retrait de la Pioche 
+        # Si la salle est placée, elle est retirée des options de tirage futures.
+        if salle_choisie.nom.upper() in PIECES_DISPONIBLES:
+            PIECES_DISPONIBLES.remove(salle_choisie.nom.upper())
+       
+
+        self.donjon[y][x] = salle_choisie
+        self.joueur.pos_y, self.joueur.pos_x = y, x
+
+        gagne = self.joueur.collecter(salle_choisie)
+        if gagne:
+            self._définir_dernier_butin(gagne)
+            self.boite_message = ("Collecté", f"Vous avez trouvé : {gagne}")
+
+
+         # Vérifie la victoire après avoir placé la salle
+        if self._vérifier_victoire():
+            return
+
+        self.action = None
+        self.cible = None
+        self.propositions = []
+        self.direction_selectionnee = None
+
+class Chambre:
+    def __init__(self, x, y, type_salle="standard", ressources=None, sorties=None, nom="SALLE", frais_entrée=0):
+        self.pos_x = x
+        self.pos_y = y
+        self.type_salle = type_salle
+        self.cout = 1 if type_salle == "special" else 0
+        self.ressources = ressources if ressources is not None else {
+            "bread": 0, "coins": 0, "gems": 0, "keys": 0, "dice": 0, "tools": []
+        }
+        self.sorties = sorties if sorties is not None else {}
+        self.visitee = False
+        self.nom = nom
+        self.frais_entrée = max(0, int(frais_entrée))
