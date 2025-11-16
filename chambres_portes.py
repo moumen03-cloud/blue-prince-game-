@@ -1,3 +1,4 @@
+
 import os
 # définir les portes de CHAQUE pièce.
 # 1 pour une porte ouverte et 0 pour une porte fermée.
@@ -71,8 +72,8 @@ DEFAULT_EXITS = {
     "CORRIDOR": {"haut": 1, "bas": 1, "gauche": 0, "droite": 0}, 
     "PASSAGE WAY": {"haut": 1, "bas": 1, "gauche": 1, "droite": 1}, 
     "SECRET PASSAGE":{"haut": 0, "bas": 1, "gauche": 0, "droite": 0},
-    "FOYER": {"haut": 1, "bas": 1, "gauche": 0, "droite": 1},
-    "GREAT HALL": {"haut": 1, "bas": 1, "gauche": 0, "droite": 0},
+    "FOYER": {"haut": 1, "bas": 1, "gauche": 0, "droite": 0},
+    "GREAT HALL": {"haut": 1, "bas": 1, "gauche": 1, "droite": 1},
    
    
    #pieces vertes
@@ -113,16 +114,19 @@ DEFAULT_EXITS = {
 
     }
 
+
 #  Dossiers/Images 
 
-DOSSIER_IMAGE = "images projet"
-CHEMIN_IMAGE_FOND = os.path.join(DOSSIER_IMAGE, "image arriere .plan.png")
+DOSSIER_IMAGE = "Images_projet"
+CHEMIN_IMAGE_FOND = os.path.join(DOSSIER_IMAGE, "image.arriere plan.png")
+
 
 # Les images de salle
 CHEMIN_IMAGE_INTRO = os.path.join(DOSSIER_IMAGE, "image introduction du jeu.png")
 CARTOGRAPHIE_IMAGES_SALLES = {
-   "THE FOUNDATION": os.path.join(DOSSIER_IMAGE, "THE FOUNDATION.png"),
-    "ENTRANCE HALL": os.path.join(DOSSIER_IMAGE, "ENTRANCE HALL.png"), 
+    # Pièces bleues (typiquement spéciales)
+    "THE FOUNDATION": os.path.join(DOSSIER_IMAGE, "THE FOUNDATION.png"),
+    "ENTRANCE HALL": os.path.join(DOSSIER_IMAGE, "entrance hall.png.png"), 
     "SPARE ROOM": os.path.join(DOSSIER_IMAGE, "SPARE ROOM.png"),
     "ROTUNDA": os.path.join(DOSSIER_IMAGE, "ROTUNDA.png"),
     "PARLOR": os.path.join(DOSSIER_IMAGE, "PARLOR.png"),
@@ -130,7 +134,7 @@ CARTOGRAPHIE_IMAGES_SALLES = {
     "GALLERY": os.path.join(DOSSIER_IMAGE, "GALLERY.png"),
     "ROOM8": os.path.join(DOSSIER_IMAGE, "ROOM8.png"),
     "CLOSET": os.path.join(DOSSIER_IMAGE, "CLOSET.png"),
-    "WALK IN CLOSET": os.path.join(DOSSIER_IMAGE, "WALK IN CLOSET.png"),
+    "WALK-IN CLOSET": os.path.join(DOSSIER_IMAGE, "WALK-IN CLOSET.png"),
     "ATTIC": os.path.join(DOSSIER_IMAGE, "ATTIC.png"),
     "STOREROOM": os.path.join(DOSSIER_IMAGE, "STOREROOM.png"),
     "NOOK": os.path.join(DOSSIER_IMAGE, "nook.png.png"),
@@ -151,7 +155,7 @@ CARTOGRAPHIE_IMAGES_SALLES = {
     "CHAMBER OF MIRRORS": os.path.join(DOSSIER_IMAGE, "CHAMBER OF MIRRORS.png"),
     "THE POOL": os.path.join(DOSSIER_IMAGE, "THE POOL.png"), 
     "DRAFTING STUDIO": os.path.join(DOSSIER_IMAGE, "DRAFTING STUDIO.png"),
-    "UTILITY CLOSET": os.path.join(DOSSIER_IMAGE, "UTILITY CLOSET.png"),
+    "UILITY CLOSET": os.path.join(DOSSIER_IMAGE, "UILITY CLOSET.png"),
     "BOILER ROOM": os.path.join(DOSSIER_IMAGE, "BOILER ROOM.png"), 
     "PUMP ROOM": os.path.join(DOSSIER_IMAGE, "PUMP ROOM.png"),
     "SECURITY": os.path.join(DOSSIER_IMAGE, "SECURITY.png"),
@@ -161,7 +165,7 @@ CARTOGRAPHIE_IMAGES_SALLES = {
     "COAT CHECK": os.path.join(DOSSIER_IMAGE, "COAT CHECK.png"), 
     "MAIL ROOM": os.path.join(DOSSIER_IMAGE, "MAIL ROOM.png"), 
     "FREEZER": os.path.join(DOSSIER_IMAGE, "FREEZER.png"), 
-    "DINNING ROOM": os.path.join(DOSSIER_IMAGE, "DINNING ROOM.png"),
+    "DINING ROOM": os.path.join(DOSSIER_IMAGE, "DINING ROOM.png"),
     "OBSERVATORY": os.path.join(DOSSIER_IMAGE, "OBSERVATORY.png"),
     "CONFERENCE ROOM": os.path.join(DOSSIER_IMAGE, "CONFERENCE ROOM.png"),
     "AQUARIUM": os.path.join(DOSSIER_IMAGE, "AQUARIUM.png"),
@@ -173,8 +177,8 @@ CARTOGRAPHIE_IMAGES_SALLES = {
     "GUEST BEDROOM": os.path.join(DOSSIER_IMAGE, "GUEST BEDROOM.png"),
     "NURSERY": os.path.join(DOSSIER_IMAGE, "NURSERY.png"),
     "SERVANT'S QUARTERS": os.path.join(DOSSIER_IMAGE, "SERVANT'S QUARTERS.png"),
-    "BUNK ROOM": os.path.join(DOSSIER_IMAGE, "BUNK ROOM.png"),
-    "THE LADY CHIP'S CHAMBER": os.path.join(DOSSIER_IMAGE, "THE LADY CHIP'S CHAMBER.png"),
+    "RUNK ROOM": os.path.join(DOSSIER_IMAGE, "RUNK ROOM.png"),
+    "THE LADY CHIPS'S CHAMBER": os.path.join(DOSSIER_IMAGE, "THE LADCHIPS'S CHAMBER.png"),
     "MASTER BEDROOM": os.path.join(DOSSIER_IMAGE, "MASTER BEDROOM.png"),
 
     # pièces marrons
@@ -182,7 +186,7 @@ CARTOGRAPHIE_IMAGES_SALLES = {
     "WEST WING HALL": os.path.join(DOSSIER_IMAGE, "WEST WING HALL.png"),
     "EAST WING HALL": os.path.join(DOSSIER_IMAGE, "EAST WING HALL.png"),
     "CORRIDOR": os.path.join(DOSSIER_IMAGE, "CORRIDOR.png"), 
-    "PASSAGE WAY": os.path.join(DOSSIER_IMAGE, "PASSAGEWAY.png"), 
+    "PASSAGE WAY": os.path.join(DOSSIER_IMAGE, "PASSAGE WAY.png"), 
     "SECRET PASSAGE": os.path.join(DOSSIER_IMAGE, "SECRET PASSAGE.png"),
     "FOYER": os.path.join(DOSSIER_IMAGE, "FOYER.png"),
     "GREAT HALL": os.path.join(DOSSIER_IMAGE, "GREAT HALL.png"),
@@ -198,7 +202,7 @@ CARTOGRAPHIE_IMAGES_SALLES = {
     "SECRET GARDEN": os.path.join(DOSSIER_IMAGE, "SECRET GARDEN.png"),
 
     # pièces jaunes
-    "COMMISSARY": os.path.join(DOSSIER_IMAGE, "COMMISSARY.png"),
+    "COMISSARY": os.path.join(DOSSIER_IMAGE, "COMISSARY.png"),
     "KITCHEN": os.path.join(DOSSIER_IMAGE, "KITCHEN.png"),
     "LOCKSMITH": os.path.join(DOSSIER_IMAGE, "LOCKSMITH.png"),
     "SHOWROOM": os.path.join(DOSSIER_IMAGE, "SHOWROOM.png"),
@@ -214,10 +218,23 @@ CARTOGRAPHIE_IMAGES_SALLES = {
     "ARCHIVES": os.path.join(DOSSIER_IMAGE, "ARCHIVES.png"),
     "GYMNASIUM": os.path.join(DOSSIER_IMAGE, "GYMNASIUM.png"),
     "DARKROOM": os.path.join(DOSSIER_IMAGE, "DARKROOM.png"),
-    "WEIGHT ROOM": os.path.join(DOSSIER_IMAGE, "WEIGHTROOM.png"),
+    "WEIGHT ROOM": os.path.join(DOSSIER_IMAGE, "WEIGHT ROOM.png"),
     "FURNACE": os.path.join(DOSSIER_IMAGE, "FURNACE.png")
 }
-   
+    
+class Chambre:
+    def __init__(self, x, y, type_salle="standard", ressources=None, sorties=None, nom="SALLE", frais_entrée=0):
+        self.pos_x = x
+        self.pos_y = y
+        self.type_salle = type_salle
+        self.cout = 1 if type_salle == "special" else 0
+        self.ressources = ressources if ressources is not None else {
+            "bread": 0, "coins": 0, "gems": 0, "keys": 0, "dice": 0, "tools": []
+        }
+        self.sorties = sorties if sorties is not None else {}
+        self.visitee = False
+        self.nom = nom
+        self.frais_entrée = max(0, int(frais_entrée))    
 
 
 
@@ -303,3 +320,9 @@ class Chambre:
         self.visitee = False
         self.nom = nom
         self.frais_entrée = max(0, int(frais_entrée))
+
+
+PIÈCES_SPÉCIALES_DÉFINIES = {
+    "VAULT", "TROPHY ROOM", "LABORATORY", "LIBRARY", "GREAT HALL", 
+    "SECRET GARDEN", "WINE CELLAR", "ANTECHAMBER" # ANTECHAMBER est toujours spéciale (la fin)
+}
