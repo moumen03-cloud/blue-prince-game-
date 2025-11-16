@@ -503,4 +503,65 @@ class ApplicationPygame:
 
         if self.boite_message:
             self._dessiner_boîte_message()  
-###########""""""""""""""""""""    
+def _dessiner_boîte_message(self):
+        overlay = pygame.Surface((FENETRE_L, FENETRE_H), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))
+        self.ecran.blit(overlay, (0, 0))
+
+        titre, texte = self.boite_message
+        boite_l, boite_h = 400, 200
+        rect_boite = pygame.Rect((FENETRE_L - boite_l) // 2, (FENETRE_H - boite_h) // 2, boite_l, boite_h)
+        pygame.draw.rect(self.ecran, COULEUR_FOND_PANNEAU, rect_boite, 0, 10)
+        pygame.draw.rect(self.ecran, COULEUR_ACCENT, rect_boite, 3, 10)
+
+        self._dessiner_texte(self.ecran, titre, (rect_boite.centerx, rect_boite.top + 20), self.police_g, JAUNE, ancre="center")
+        self._dessiner_texte(self.ecran, texte, (rect_boite.centerx, rect_boite.top + 70), self.police_m, COULEUR_TEXTE, ancre="center")
+
+        rect_ok = pygame.Rect(rect_boite.centerx - 50, rect_boite.bottom - 50, 100, 30)
+        pygame.draw.rect(self.ecran, COULEUR_ACCENT, rect_ok, 0, 5)
+        self._dessiner_texte(self.ecran, "OK", rect_ok.center, self.police_m, COULEUR_FOND_CARTE_PRINCIPALE, ancre="center")
+        self.rect_ok_boite_message = rect_ok
+
+def _définir_dernier_butin(self, gagne: dict):
+        parties = []
+        for k in ("pieces", "coins", "gems", "keys", "dice"):
+            if gagne.get(k, 0):
+                parties.append(f"{k}+{gagne[k]}")
+        if "tools" in gagne and gagne["tools"] is not None and len(gagne["tools"]) > 0:
+            parties.append("outils: " + ", ".join(gagne["tools"]))
+        self.dernier_butin_texte = ", ".join(parties) if parties else "—"
+
+def _gérer_sélection_salle_draft(self, index):
+        if index >= len(self.propositions):
+            return
+        
+        y, x = self.cible
+        salle_choisie = self.propositions[index]
+
+        if not self.joueur.se_déplacer():
+            self.boite_message = ("Déplacement Impossible", "Plus de pas restants pour poser la pièce!")
+            self.action = None; return
+
+        if salle_choisie.type_salle == "special" and not self.joueur.payer("coins", 3):
+            self.boite_message = ("Pièce Spéciale", "Pas assez de Pièces (Coût: 3 Pièce). Annulation du placement.")
+            self.joueur.pas_restants += 1
+            self.action = None; return
+
+        if salle_choisie.frais_entrée > 0:
+            if not self.joueur.payer("coins", salle_choisie.frais_entrée):
+                self.boite_message = ("Salle Payante", f"Besoin de {salle_choisie.frais_entrée} pièces pour entrer. Placement annulé.")
+                self.joueur.pas_restants += 1
+                self.action = None; return
+
+        self.donjon[y][x] = salle_choisie
+        self.joueur.pos_y, self.joueur.pos_x = y, x
+
+        gagne = self.joueur.collecter(salle_choisie)
+        if gagne:
+            self._définir_dernier_butin(gagne)
+            self.boite_message = ("Collecté", f"Vous avez trouvé : {gagne}")
+
+        self.action = None
+        self.cible = None
+        self.propositions = []
+        self.direction_selectionnee = None   
